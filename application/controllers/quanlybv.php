@@ -63,6 +63,15 @@ class quanlybv extends CI_Controller {
 		]);
 		echo $dataMedi;
 	}
+
+	public function pushDataToModel()
+	{
+		$dataToSend = $this->input->post('dataToSend');
+		echo "<pre>";
+		var_dump($dataToSend);
+		// $this->load->model('hos_model');
+		// $this->hos_model->insertData($dataToSend);
+	}
 }
 
 /* End of file quanlybv.php */

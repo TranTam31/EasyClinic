@@ -42,7 +42,6 @@
 							</div>
 
 							<div class="col-md-6">
-								<!-- <label>Tên: <span id="name"></span></label> -->
 							</div>
 						</div>
 						<br>
@@ -73,7 +72,7 @@
 											<b>Chọn ngày khám</b>
 										</label>
 										<div class="col-sm-8">
-											<input type="date" class="form-control" id="datepicker">
+											<input type="date" class="form-control ngaykham" id="datepicker">
 										</div>
 									</div>
 								</div>
@@ -125,7 +124,7 @@
 											<b>Kết quả khám</b>
 										</label>
 										<div class="col-sm-10">
-											<textarea class="form-control" id="textArea" rows="2"></textarea>
+											<textarea class="form-control" id="ketquakham" rows="2"></textarea>
 										</div>
 									</div>
 									<br>
@@ -136,7 +135,7 @@
 													<b>Ngày tái khám</b>
 												</label>
 												<div class="col-sm-8">
-													<input type="date" class="form-control" id="datepicker">
+													<input type="date" class="form-control ngaytaikham" id="datepicker">
 												</div>
 											</div>
 										</div>
@@ -147,7 +146,7 @@
 													<b>Thanh toán</b>
 												</label>
 												<div class="col-sm-8">
-													<input class="form-control" placeholder="Số tiền thanh toán">
+													<input class="form-control payment" placeholder="Số tiền thanh toán">
 												</div>
 											</div>
 										</div>
@@ -160,13 +159,13 @@
 										</div>
 										<div class="themthuoc_group">
 											<div class="card-body load_themthuoc">
-												<div>
+												<div class="motcuc">
 													<div class="row">
 														<div class="col-sm-2">
 															<b>Phần chọn thuốc</b>
 														</div>
 														<div class="col-sm-10">
-															<input class="form-control med_name" type="text" placeholder="Vui lòng nhập tên thuốc">
+															<input class="form-control med_name" type="text" placeholder="Vui lòng nhập tên thuốc" data-id="">
 														</div>
 													</div>
 													<br>
@@ -200,7 +199,7 @@
 						<div class="row">
 							<div class="col-sm-10">
 								<button type="submit" class="btn btn-primary themluotkham">Thêm lượt khám</button>
-								<button type="submit" class="btn btn-success">Submit</button>
+								<button type="submit" class="btn btn-success laydulieu">Submit</button>
 							</div>
 						</div>
 					</div>
@@ -241,7 +240,6 @@
 		        $('.ui-autocomplete').addClass('autocomplete-results');
 		    }
 		});
-
 		aDataMed = {}
 		$(document).on('focus', '.med_name', function () {
 		    $(this).autocomplete({
@@ -263,37 +261,14 @@
 		                }
 		            });
 		        },
+		        select: function (event, ui) {
+		        	$(this).attr('data-id', ui.item.id);
+		        },
 		        open: function (event, ui) {
 		            $('.ui-autocomplete').addClass('autocomplete-results');
 		        }
 		    });
 		});
-
-		// $('.med_name').autocomplete({
-		// 	// aDataMed = {}
-		// 	source: function(request, response) {
-		// 		$.ajax({
-		// 			url: 'quanlybv/getDataMedicine',
-		// 			type: 'GET',
-		// 			dataType: 'json',
-		// 			success: function(data) {
-		// 				//console.log(data)
-		// 				aDataMed = $.map(data.dulieuthuoc, function(value, key) {
-		// 					return {
-		// 						id: value.med_id,
-		// 						label :value.med_name,
-		// 					};
-		// 				});
-		// 				//console.log(aData)
-		// 				var results = $.ui.autocomplete.filter(aDataMed, request.term);
-		// 				response(results);
-		// 			}
-		// 		})
-		// 	},
-		// 	open: function(event, ui) {
-		//         $('.ui-autocomplete').addClass('autocomplete-results');
-		//     }
-		// });
 
 		$('.load_select').on('change', '.select_group .faculty', function() {
             var $selectGroup = $(this).closest('.select_group');
@@ -411,14 +386,15 @@
 	            str += "<div class=card-header>";
 	            str += "<b>Thuốc</b>";
 	            str += "</div>";
+	            str += "<div class='themthuoc_group'>";
 	            str += "<div class='card-body load_themthuoc'>";
-	            str += "<div>";
+	            str += "<div class='motcuc'>";
 	            str += "<div class='row'>";
 	            str += "<div class='col-sm-2'>";
 	            str += "<b>Phần chọn thuốc</b>";
 	            str += "</div>";
 	            str += "<div class='col-sm-10'>";
-	            str += "<input class='form-control med_name' type='text' placeholder='Vui lòng nhập tên thuốc'>";
+	            str += "<input class='form-control med_name' type='text' placeholder='Vui lòng nhập tên thuốc' data-id=''>";
 	            str += "</div>";
 	            str += "</div>";
 	            str += "<br>";
@@ -444,6 +420,7 @@
 	            str += "</div>";
 	            str += "</div>";
 	            str += "</div>";
+	            str += "</div>";
 
 	            $('.load_select').append(str);
 	        })
@@ -454,22 +431,22 @@
 	            console.log("complete");
 	        });
         });
-
+		
 		$('.load_select').on('click', '.nutthemthuoc', function(event) {
-		    var $selectGroup = $(this).closest('.select_group'); // Xác định lượt khám cụ thể
-		    var $medNameInput = $selectGroup.find('.med_name');
+		    var $themthuocGroup = $(this).closest('.themthuoc_group');
+		    var $selectGroup = $themthuocGroup.closest('.select_group');
 		    $.ajax({
 	        })
 		    .done(function(data) {
 	            var str = "";
 	            str += "<hr>";
-	            str += "<div>";
+	            str += "<div class='motcuc'>";
 	            str += "<div class='row'>";
 	            str += "<div class='col-sm-2'>";
 	            str += "<b>Phần chọn thuốc</b>";
 	            str += "</div>";
 	            str += "<div class='col-sm-10'>";
-	            str += "<input class='form-control med_name' type='text' placeholder='Vui lòng nhập tên thuốc'>";
+	            str += "<input class='form-control med_name' type='text' placeholder='Vui lòng nhập tên thuốc' data-id=''>";
 	            str += "</div>";
 	            str += "</div>";
 	            str += "<br>";
@@ -478,12 +455,14 @@
 	            str += "<b>Liều dùng</b>";
 	            str += "</label>";
 	            str += "<div class='col-sm-10'>";
-	            str += "<textarea class='form-control' id='textArea' rows='2'></textarea>";
+	            str += "<textarea class='form-control med_dose' id='textArea' rows='2'></textarea>";
 	            str += "</div>";
 	            str += "</div>";
 	            str += "</div>";
 	            
-	            $(this).closest('.select_group').find('.load_themthuoc').append(str);
+	            $themthuocGroup.find('.load_themthuoc').append(str);
+
+	            // donThuocCount++;
 	        })
 	        .fail(function() {
 	            console.log("error");
@@ -492,67 +471,64 @@
 	            console.log("complete");
 	        });
 		});
-		
-		
-		// $('.load_select').on('click', '.nutthemthuoc', function(event) {
-		//     var $selectGroup = $(this).closest('.select_group'); // Xác định lượt khám cụ thể
-		//     var $medNameInput = $selectGroup.find('.med_name');
-		//     var $medDoseTextarea = $selectGroup.find('.med_dose');
-		    
-		//     // Lấy giá trị của tên thuốc và liều dùng từ các trường nhập liệu
-		//     var medName = $medNameInput.val();
-		//     var medDose = $medDoseTextarea.val();
 
-		//     // Kiểm tra xem tên thuốc và liều dùng có giá trị không trống
-		//     if (medName.trim() !== '' && medDose.trim() !== '') {
-		//         // Tạo một mẩu HTML mới cho loại thuốc và liệt kê thông tin trong lượt khám
-		//         var newMedHtml = '<hr><div><div class="row"><div class="col-sm-2"><b>Phần chọn thuốc</b></div><div class="col-sm-10"><input class="form-control" type="text" value="' + medName + '" readonly></div></div><br><div class="row"><label class="col-sm-2 col-form-label d-block"><b>Liều dùng</b></label><div class="col-sm-10"><textarea class="form-control" rows="2" readonly>' + medDose + '</textarea></div></div></div>';
+		$('.laydulieu').click(function(event) {
+		    // Tạo một đối tượng chứa toàn bộ dữ liệu
+		    var dataToSend = {
+		        identity: $('#identity').val(),
+		        ngaykham: $('.ngaykham').val(),
+		        appointments: []
+		    };
 
-		//         // Chèn mẩu HTML mới vào lượt khám cụ thể
-		//         $selectGroup.find('.load_themthuoc').append(newMedHtml);
+		    // Duyệt qua tất cả các lượt khám
+		    $('.select_group').each(function() {
+		        var $selectGroup = $(this);
+		        var appointmentData = {
+		            doctor: $selectGroup.find('.doctor').val(),
+		            results: $selectGroup.find('#ketquakham').val(),
+		            revisit_date: $selectGroup.find('.ngaytaikham').val(),
+		            payment: $selectGroup.find('.payment').val(),
+		            medicines: []
+		        };
 
-		//         // Xóa giá trị của tên thuốc và liều dùng sau khi đã thêm
-		//         $medNameInput.val('');
-		//         $medDoseTextarea.val('');
-		//     }
-		// });
+		        // Duyệt qua tất cả các đơn thuốc trong lượt khám
+		        // chỗ này mình debug chuẩn luôn nha(mình thêm cái motcuc vào), vì là mỗi lần duyệt cái nhóm loại thuốc thì nó phải lấy từng cái div đấy trong vòng lặp. Là thế đó. Nên là mới hay hehehehe.
+		        $selectGroup.find('.themthuoc_group').find('.motcuc').each(function() {
+		            var $themthuocGroup = $(this);
+		            var medicineData = {
+		                med_id: $themthuocGroup.find('.med_name').attr('data-id'),
+		                med_dose: $themthuocGroup.find('.med_dose').val()
+		            };
 
+		            // Thêm dữ liệu đơn thuốc vào danh sách thuốc
+		            appointmentData.medicines.push(medicineData);
+		        });
 
-        // $('.nutthemthuoc').click(function(event) {
-        // 	$.ajax({
-	    //     })
-		//     .done(function(data) {
-	    //         var str = "";
-	    //         str += "<hr>";
-	    //         str += "<div>";
-	    //         str += "<div class='row'>";
-	    //         str += "<div class='col-sm-2'>";
-	    //         str += "<b>Phần chọn thuốc</b>";
-	    //         str += "</div>";
-	    //         str += "<div class='col-sm-10'>";
-	    //         str += "<input class='form-control med_name' type='text' placeholder='Vui lòng nhập tên thuốc'>";
-	    //         str += "</div>";
-	    //         str += "</div>";
-	    //         str += "<br>";
-	    //         str += "<div class='row'>";
-	    //         str += "<label class='col-sm-2 col-form-label d-block'>";
-	    //         str += "<b>Liều dùng</b>";
-	    //         str += "</label>";
-	    //         str += "<div class='col-sm-10'>";
-	    //         str += "<textarea class='form-control' id='textArea' rows='2'></textarea>";
-	    //         str += "</div>";
-	    //         str += "</div>";
-	    //         str += "</div>";
-	            
-	    //         $('.load_themthuoc').append(str);
-	    //     })
-	    //     .fail(function() {
-	    //         console.log("error");
-	    //     })
-	    //     .always(function(data) {
-	    //         console.log("complete");
-	    //     });
-        // });
+		        // Thêm dữ liệu lượt khám vào danh sách lượt khám
+		        dataToSend.appointments.push(appointmentData);
+		    });
+
+		    // Gửi dữ liệu dưới dạng JSON bằng AJAX
+		    $.ajax({
+		        url: 'quanlybv/pushDataToModel',
+		        type: 'POST',
+		        data: JSON.stringify(dataToSend),
+		        contentType: 'application/json; charset=utf-8',
+		        dataType: 'json',
+		    })
+		    .done(function(response) {
+		        // Xử lý kết quả trả về từ máy chủ (nếu cần)
+		        console.log(response);
+		    })
+		    .fail(function() {
+		        console.log("error");
+		    })
+		    .always(function(data) {
+		        console.log("complete");
+		        console.log(data);
+		    });
+		});
+
 	</script>
 </body>
 </html>
