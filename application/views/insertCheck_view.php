@@ -11,10 +11,15 @@
   	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
   	<!-- đây là phần thêm font -->
   	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   	<script type="text/javascript" src="<?php echo base_url() ?>lib/jquery-3.7.1.min.js"></script>
   	<script type="text/javascript" src="<?php echo base_url() ?>lib/json2.js"></script>
+  	<link rel="stylesheet" href="<?php echo base_url() ?>lib/menu_design.css">
   	<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
   	<style>
+  		.main{
+     		padding-top: 60px;
+     	}
         .autocomplete-results {
             max-height: 200px;
             overflow-y: auto;
@@ -22,12 +27,13 @@
     </style>
 </head>
 <body>
-	<div class="container">
+	<?php require('menuchung.php') ?>
+	<div class="container main">
 		<div class="row">
 			<div class="col">
 				<div class="card mt-4">
 					<div class="card-header">
-						<h3><i>Phần tìm kiếm người tới khám nè</i></h3>
+						<h3><b>Thêm lượt khám mới</b></h3>
 						<hr>
 						<div class="row">
 							<div class="col-md-6">
@@ -212,7 +218,7 @@
 		$('#identity').autocomplete({
 			source: function(request, response) {
 				$.ajax({
-					url: 'quanlybv/getDataIdentity',
+					url: 'getDataIdentity',
 					type: 'GET',
 					dataType: 'json',
 					success: function(data) {
@@ -245,7 +251,7 @@
 		    $(this).autocomplete({
 		        source: function (request, response) {
 		            $.ajax({
-		                url: 'quanlybv/getDataMedicine',
+		                url: 'getDataMedicine',
 		                type: 'GET',
 		                dataType: 'json',
 		                success: function (data) {
@@ -278,7 +284,7 @@
             // Thực hiện AJAX request và xử lý dữ liệu với city_id
             if (fac_id) {
                 $.ajax({
-                    url: 'quanlybv/getDataDocSelect',
+                    url: 'getDataDocSelect',
                     type: 'POST',
                     data: { fac_id: fac_id },
                     dataType: 'json',
@@ -309,7 +315,7 @@
 
         $('.themluotkham').click(function(event) {
         	$.ajax({
-	            url: 'quanlybv/getDataFacSelect_ajax',
+	            url: 'getDataFacSelect_ajax',
 	            type: 'POST',
 	            dataType: 'json',
 	        })
@@ -354,7 +360,7 @@
 	            str += "<b>Kết quả khám</b>";
 	            str += "</label>";
 	            str += "<div class='col-sm-10'>";
-	            str += "<textarea class='form-control' id='textArea' rows='2'></textarea>";
+	            str += "<textarea class='form-control' id='ketquakham' rows='2'></textarea>";
 	            str += "</div>";
 	            str += "</div>";
 	            str += "<br>";
@@ -365,7 +371,7 @@
 	            str += "<b>Ngày tái khám</b>";
 	            str += "</label>";
 	            str += "<div class='col-sm-8'>";
-	            str += "<input type='date' class='form-control' id='datepicker'>";
+	            str += "<input type='date' class='form-control ngaytaikham' id='datepicker'>";
 	            str += "</div>";
 	            str += "</div>";
 	            str += "</div>";
@@ -375,15 +381,15 @@
 	            str += "<b>Thanh toán</b>";
 	            str += "</label>";
 	            str += "<div class='col-sm-8'>";
-	            str += "<input class='form-control' placeholder='Số tiền thanh toán'>";
+	            str += "<input class='form-control payment' placeholder='Số tiền thanh toán'>";
 	            str += "</div>";
 	            str += "</div>";
 	            str += "</div>";
 	            str += "</div>";
 	            str += "</div>";
-	            str += "<div class=card-body'>";
+	            str += "<div class='card-body'>";
 	            str += "<div class='card'>";
-	            str += "<div class=card-header>";
+	            str += "<div class='card-header'>";
 	            str += "<b>Thuốc</b>";
 	            str += "</div>";
 	            str += "<div class='themthuoc_group'>";
@@ -510,10 +516,9 @@
 
 		    // Gửi dữ liệu dưới dạng JSON bằng AJAX
 		    $.ajax({
-		        url: 'quanlybv/pushDataToModel',
+		        url: 'pushDataToModel',
 		        type: 'POST',
-		        data: JSON.stringify(dataToSend),
-		        contentType: 'application/json; charset=utf-8',
+		        data: { dataToSend : dataToSend},
 		        dataType: 'json',
 		    })
 		    .done(function(response) {
@@ -525,7 +530,6 @@
 		    })
 		    .always(function(data) {
 		        console.log("complete");
-		        console.log(data);
 		    });
 		});
 
