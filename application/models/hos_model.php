@@ -168,6 +168,72 @@ class hos_model extends CI_Model {
 			return 1;
 		}
 	}
+
+	// tra cứu
+	public function getMangNgay($identity)
+	{
+		$this->db->distinct();
+        $this->db->select('checkDate');
+        $this->db->where('identity', $identity);
+        $this->db->order_by('checkDate', 'DESC');
+        return $this->db->get('checkup');
+	}
+
+	public function getMangLuotKham($identity,$ngayKham)
+	{
+		$this->db->select('
+			id_luotkham,
+			doctor_id,
+			result, 
+			recheckDate, 
+			fee
+		');
+		$conditions = array(
+		    'identity' => $identity,
+		    'checkDate' => $ngayKham
+		);
+
+		$this->db->where($conditions);
+		//$this->db->where('checkDate', $ngayKham);
+		return $this->db->get('checkup');
+	}
+
+	public function getDataBacSi($idDoctor)
+	{
+		$this->db->select('d.doctor_name, fa.fac_name');
+        $this->db->from('doctor d');
+        $this->db->join('faculty fa', 'd.fac_id = fa.fac_id');
+        $this->db->where('doctor_id', $idDoctor);
+        $query = $this->db->get();
+        return $query;
+	}
+
+	// public function getMangDonThuoc($idLuotKham)
+	// {
+	// 	$this->db->select('p.dose, m.med_name');
+    //     $this->db->from('prescription p');
+    //     $this->db->join('medicine m', 'p.med_id = m.med_id');
+    //     $this->db->where('id_luotkham', $idLuotKham);
+    //     $query = $this->db->get();
+    //     return $query;
+	// }
+
+	public function getResult($id_luotKham)
+	{
+		$this->db->select('result');
+		$this->db->where('id_luotkham', $id_luotKham);
+		return $this->db->get('checkup');
+	}
+
+	public function getDonThuoc($id_luotKham)
+	{
+		$this->db->select('p.dose, m.med_name');
+        $this->db->from('prescription p');
+        $this->db->join('medicine m', 'p.med_id = m.med_id');
+        $this->db->where('id_luotkham', $id_luotKham);
+        $query = $this->db->get();
+        return $query;
+	}
 }
 
 /* End of file hos_model.php */

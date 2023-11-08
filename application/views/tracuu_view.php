@@ -16,6 +16,8 @@
   	<link rel="stylesheet" href="<?php echo base_url() ?>lib/menu_design.css">
   	<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
   	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+  	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.5/dist/sweetalert2.min.css"></script>
   	<style>
      	.main{
      		padding-top: 60px;
@@ -24,6 +26,23 @@
             max-height: 200px;
             overflow-y: auto;
         }
+
+		/*hơ hơ chỗ này là mình ghi đè cái thuộc tính của bảng popup nè, đỉnh vl:)))*/
+        .swal2-popup {
+		    display: none;
+		    position: relative;
+		    box-sizing: border-box;
+		    grid-template-columns: minmax(0, 100%);
+		    width: 43em;
+		    max-width: 100%;
+		    padding: 0 0 1.25em;
+		    border: none;
+		    border-radius: 5px;
+		    background: #fff;
+		    color: #545454;
+		    font-family: inherit;
+		    font-size: 1rem;
+		}
     </style>
 </head>
 <body>
@@ -31,7 +50,7 @@
 	<div class="container main">
 		<div class="row">
 			<div class="col-md-12">
-				<div class="card mt-4">
+				<div class="card">
 					<div class="card-header">
 						<h3><b>Tra cứu thông tin người tới khám</b></h3>
 					</div>
@@ -44,42 +63,27 @@
 								<input type="text" class="form-control identity" placeholder="Nhập CCCD vào đây">
 							</div>
 							<div class="col-md-3">
-								<button class="form-control btn btn-success nuttimthuoc">Tìm kiếm</button>
+								<button class="form-control btn btn-success nutshowdata">Tìm kiếm</button>
 							</div>
 						</div>
 
 						<br>
-						<!-- <table class="table load_thuoc">
-					      <tbody>
-					        <tr>
-					          <th class="col-2">ID</th>
-					          <td><i>... (Vui lòng nhập tìm một loại thuốc)</i></td>
-					        </tr>
-					        <tr>
-					          <th class="col-2">Nhà cung cấp</th>
-					          <td><i>... (Vui lòng nhập tìm một loại thuốc)</i></td>
-					        </tr>
-					        <tr>
-					          <th class="col-2">Thành phần</th>
-					          <td><i>... (Vui lòng nhập tìm một loại thuốc)</i></td>
-					        </tr>
-					        <tr>
-					          <th class="col-2">Chỉ định</th>
-					          <td><i>... (Vui lòng nhập tìm một loại thuốc)</i></td>
-					        </tr>
-					      </tbody>
-					    </table> -->
-					    <!-- <div class="row">
-					    	<div class="col-2">
-					    		
-					    	</div>
-					    	<div class="col-3 load_nutok">
-					    		<button class="form-control btn btn-warning nutsuathuoc">Sửa thông tin thuốc</button>
-					    	</div>
-					    	<div class="col-3 load_nutxoa">
-					    		<button class="form-control btn btn-danger nutxoathuoc">Xóa thuốc</button>
-					    	</div>
-					    </div> -->
+						<table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Khoa</th>
+                                    <th>Bác sĩ khám</th>
+                                    <th>Kết quả khám</th>
+                                    <th>Ngày tái khám</th>
+                                    <th>Đơn thuốc</th>
+                                    <th>Thanh toán</th>
+                                </tr>
+
+                            </thead>
+                            <tbody id="load_noidung">
+                                
+                            </tbody>
+                        </table>
 					</div>
 				</div>
 			</div>
@@ -120,6 +124,128 @@
 			    }
 			});
 		});
+
+		$(document).on('click', '.nutshowdata', function(event) {
+			var identity = $('.identity').val();
+			if(identity) {
+				$.ajax({
+					url: 'getDataCheckUp',
+					type: 'POST',
+					dataType: 'json',
+					data: {identity: identity},
+				})
+				.done(function(data) {
+					console.log(data);
+					var str= '';
+					if(data.length != 0) {
+                    $.each(data,function(i, item) {
+                        str+="<h6><i>Ngày khám: " + item.ngaykham + "</i></h6>";
+                        $.each(item.thongtin,function(index, el) {
+	                        str+= "<tr>"
+	                        str+= "<th>"+el.tenkhoa+"</th>"
+	                        str+= "<th>"+el.tenbacsi+"</th>"
+	                        str+= "<th><button data-val='"+ el.id_luotkham +"'class='form-control btn btn-outline-warning nutxemketqua'>Xem</button></th>"
+	                        str+= "<th>"+el.ngaykhamlai+"</th>"
+	                        str+= "<th><button data-val='"+ el.id_luotkham +"'class='form-control btn btn-outline-warning nutxemthuoc'>Xem</button></th>"
+	                        str+= "<th>"+el.thanhtoan+"</th>"
+	                        str+= "</tr>" 
+                        });
+                    });
+                } else {
+                    str+="<h6 class='text-danger text-center mt-3'>Người này chưa có dữ liệu</h6>";
+                }
+	    		$('#load_noidung').html(str);
+				})
+				.fail(function() {
+					console.log("error");
+				})
+				.always(function(data) {
+					console.log(data);
+				});
+				
+			}
+		});
+
+		$(document).on('click', '.nutxemketqua', function(event) {
+			var id_luotKham = $(this).data('val');
+			//alert(id_luotKham);
+			if(id_luotKham) {
+				$.ajax({
+					url: 'getResult',
+					type: 'POST',
+					dataType: 'json',
+					data: {id_luotKham: id_luotKham},
+				})
+				.done(function(data) {
+					console.log(data);
+					(async () => {
+			          const { value: formValues } = await Swal.fire({
+			            title: 'Kết quả khám',
+			            html:
+			              '<table class="table table-bordered">'
+			               + '<tr><th>'+ data[0].result +'</th></tr>' + 
+			               '</table>'
+			          })
+			        })()
+				})
+				.fail(function() {
+					console.log("error");
+				})
+				.always(function() {
+					console.log("complete");
+				});
+				
+			}
+	    });
+
+		$(document).on('click', '.nutxemthuoc', function(event) {
+			var id_luotKham = $(this).data('val');
+			if(id_luotKham) {
+				$.ajax({
+					url: 'getDonThuoc',
+					type: 'POST',
+					dataType: 'json',
+					data: {id_luotKham: id_luotKham},
+				})
+				.done(function(data) {
+					console.log(data);
+	                (async () => {
+		                let htmlContent = '<table class="table table-bordered">' +
+		                                '<thead>' +
+		                                '<tr>' +
+		                                '<th>STT</th>' +
+		                                '<th>Thuốc</th>' +
+		                                '<th>Liều dùng</th>' +
+		                                '</tr>' +
+		                                '</thead>' +
+		                                '<tbody>';
+
+		                $.each(data, function (index, val) {
+		                    htmlContent +=
+		                        '<tr>' +
+		                        '<td>' + (index + 1) + '</td>' +
+		                        '<td>' + val.med_name + '</td>' +
+		                        '<td>' + val.dose + '</td>' +
+		                        '</tr>';
+		                });
+
+		                htmlContent += '</tbody></table>';
+
+		                const formValues = await Swal.fire({
+		                    title: 'Kết quả khám',
+		                    html: htmlContent
+		                });
+		            })();
+				})
+				.fail(function() {
+					console.log("error");
+				})
+				.always(function() {
+					console.log("complete");
+				});
+				
+			}
+	    });
 	</script>
 </body>
 </html>

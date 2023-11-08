@@ -133,14 +133,70 @@ class quanlybv extends CI_Controller {
 		$this->load->view('tracuu_view');
 	}
 
+	public function getDataCheckUp()
+	{
+		$identity = $this->input->post('identity');
+		$this->load->model('hos_model');
+		$mangNgay = $this->hos_model->getMangNgay($identity)->result_array();
+		// echo "<pre>";
+		// var_dump($mangNgay);
+		$uay = array();
+		foreach ($mangNgay as $tungngay) {
+		    $ngayKham = $tungngay['checkDate'];
+		    $mangLuotkham = $this->hos_model->getMangLuotKham($identity,$ngayKham)->result_array();
+		    $thongTin = array();
+		    foreach ($mangLuotkham as $luotKham) {
+		    	$idLuotKham = $luotKham['id_luotkham'];
+		    	$idDoctor = $luotKham['doctor_id'];
+		    	$dulieuBacSi = $this->hos_model->getDataBacSi($idDoctor)->result_array();
+			    	$tenKhoa = $dulieuBacSi[0]['fac_name'];
+			    	$tenBacsi = $dulieuBacSi[0]['doctor_name'];
+			    	$ketquaKham = $luotKham['result'];
+			    	$ngayKhamLai = $luotKham['recheckDate'];
+			    	$thanhToan = $luotKham['fee'];
+		    	//$mangDonThuoc = $this->hos_model->getMangDonThuoc($idLuotKham)->result_array();
+		    	
+	    	    	$tmp = array(
+	    	    		'id_luotkham' => $idLuotKham,
+		    	    	'tenkhoa' => $tenKhoa, 
+		    	    	'tenbacsi' => $tenBacsi,
+		    	    	'ngaykhamlai' => $ngayKhamLai,
+		    	    	'thanhtoan' => $thanhToan, 
+		    	    );
+	    	    	$thongTin[] = $tmp;
+		    }
+		    $motluot = array(
+		    	'ngaykham' => $ngayKham,
+		    	'thongtin' => $thongTin,
+		    );
+	    	$uay[] = $motluot;
+		}
+
+		echo json_encode($uay);
+	}
+
+	public function getResult()
+	{
+		$id_luotKham = $this->input->post('id_luotKham');
+		$this->load->model('hos_model');
+		$result = $this->hos_model->getResult($id_luotKham)->result();
+		echo json_encode($result);
+	}
+
+	public function getDonThuoc()
+	{
+		$id_luotKham = $this->input->post('id_luotKham');
+		$this->load->model('hos_model');
+		$donThuoc = $this->hos_model->getDonThuoc($id_luotKham)->result();
+		echo json_encode($donThuoc);
+	}
+
 	// thêm lượt khám
 	public function themluotkham()
 	{
 		$this->load->model('hos_model');
 		$fac_main = $this->hos_model->getFac_selectMain();
 		$fac_main = array("mangkhoa" => $fac_main);
-		// echo "<pre>";
-		// var_dump($fac_main);
 		$this->load->view('insertCheck_view', $fac_main);
 	}
 
