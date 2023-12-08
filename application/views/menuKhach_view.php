@@ -26,8 +26,7 @@
   	</style>
 </head>
 <body class="anh">
-	
-	<?php require('menuchung.php') ?>
-	
+	<?php require('menuchungKhach.php') ?>
+	<?php $identity = $this->session->userdata('identity'); ?>
 </body>
 </html>

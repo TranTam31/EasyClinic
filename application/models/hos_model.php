@@ -10,6 +10,24 @@ class hos_model extends CI_Model {
 		
 	}
 
+	// phần cho người khám nhé
+	public function getDataPeople($identity)
+	{
+		$this->db->select('*');
+		$this->db->where('identity', $identity);
+		return $this->db->get('people');
+	}
+
+	public function updatePassword($identity,$new_pass)
+	{
+		$data = array(
+			'passdangnhap' => $new_pass, 
+			);
+		$this->db->where('identity', $identity);
+		return $this->db->update('people', $data);
+	}
+
+	// cho các phần kia
 	public function getIdentity()
 	{
 		$this->db->select('
@@ -19,6 +37,7 @@ class hos_model extends CI_Model {
 			');
 		return $this->db->get('people');
 	}
+
 
 	public function getMedicineName()
 	{
@@ -165,6 +184,26 @@ class hos_model extends CI_Model {
 			return 0;
 		} else {
 			$this->db->insert('medicine', $dulieu);
+			return 1;
+		}
+	}
+
+	// thêm người tới khám
+	public function themnguoikhamvaodb($p_iden,$p_name,$p_sex,$p_date,$p_address,$p_phone,$p_pass)
+	{
+		$dulieu = array(
+			'identity' => $p_iden,
+			'people_name' => $p_name,
+			'sex' => $p_sex,
+			'dob' => $p_date,
+			'people_phone' => $p_phone,
+			'address' => $p_address,
+			'passdangnhap' => $p_pass,
+			);
+		if($this->db->get_where('people', array('identity' => $p_iden))->num_rows() > 0) {
+			return 0;
+		} else {
+			$this->db->insert('people', $dulieu);
 			return 1;
 		}
 	}

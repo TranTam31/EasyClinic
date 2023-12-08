@@ -262,7 +262,17 @@
 		                        };
 		                    });
 
-		                    var results = $.ui.autocomplete.filter(aDataMed, request.term);
+		                    // var results = $.ui.autocomplete.filter(aDataMed, request.term);
+		                    var results = [];
+
+		                    // Lọc các từ bắt đầu bằng chuỗi nhập vào
+		                    var term = request.term.toLowerCase();
+		                    aDataMed.forEach(function (item) {
+		                        if (item.label.toLowerCase().startsWith(term)) {
+		                            results.push(item);
+		                        }
+		                    });
+
 		                    response(results);
 		                }
 		            });
@@ -515,22 +525,28 @@
 		    });
 
 		    // Gửi dữ liệu dưới dạng JSON bằng AJAX
-		    $.ajax({
-		        url: 'pushDataToModel',
-		        type: 'POST',
-		        data: { dataToSend : dataToSend},
-		        dataType: 'json',
-		    })
-		    .done(function(response) {
-		        // Xử lý kết quả trả về từ máy chủ (nếu cần)
-		        console.log(response);
-		    })
-		    .fail(function() {
-		        console.log("error");
-		    })
-		    .always(function(data) {
-		        console.log("complete");
-		    });
+		    var confirmation = confirm("Bạn có muốn thêm lượt khám này không?");
+    		if (confirmation) {
+			    $.ajax({
+			        url: 'pushDataToModel',
+			        type: 'POST',
+			        data: { dataToSend : dataToSend},
+			        dataType: 'json',
+			    })
+			    .done(function(response) {
+			        // Xử lý kết quả trả về từ máy chủ (nếu cần)
+			        console.log(response);
+			        window.location.reload();
+			    })
+			    .fail(function() {
+			        console.log("error");
+			        window.location.reload();
+			    })
+			    .always(function(data) {
+			        console.log("complete");
+			        window.location.reload();
+			    });
+			}
 		});
 
 	</script>

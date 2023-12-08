@@ -79,48 +79,47 @@
       			if(userType == 0) {
       				alert("Bạn chưa chọn option");
       			}
-
       			if(userType == 1) {
-      				if(identity == 'hospitalProject' && password == 'tranductam31') {
-      					$.ajax({
-      						
-      					})
-      					.done(function() {
-      						console.log("success");
-      						//alert("Đã đăng nhập vào bằng nhân viên");
-      						window.location.href = 'http://localhost/hosPro/index.php/quanlybv/menu';
-      					})
-      					.fail(function() {
-      						console.log("error");
-      					})
-      					.always(function() {
-      						console.log("complete");
-      					});
-      					
-      				} else {
-      					alert("Bạn nhập sai tên tài khoản hoặc password");
-      				}
+      				$.ajax({
+					    url: 'taoSession',
+					    method: 'POST',
+					    data: {
+					        userType: userType,
+					        identity: identity,
+					        password: password
+					    }
+					})
+					.done(function(response) {
+					    if (response === 'success') {
+					        window.location.href = 'http://localhost/hosPro/index.php/quanlybv/menu';
+					    } else {
+					        alert("Bạn nhập sai tên tài khoản hoặc password");
+					    }
+					})
+					.fail(function() {
+					    console.log("error");
+					})
+					.always(function() {
+					    console.log("complete");
+					});
       			} else if(userType == 2){
       				if(identity) {
 	      				$.ajax({
-	      					url: 'quanlybv/getPassword',
+	      					url: 'taoSession',
 	      					type: 'POST',
-	      					dataType: 'json',
-	      					data: {identity: identity},
+	      					data: {
+	      						userType: userType,
+	      						identity: identity,
+	      						password: password
+	      					},
 	      				})
-	      				.done(function(data) {
-	      					console.log("success");
-	      					console.log(data);
-	      					if(password == data.matkhau[0]['passdangnhap']) {
-	      						//alert("Bạn đã đăng nhập vào người dùng thành công");
-	      						//window.location.href = 'url_of_employee_dashboard.html';
-	      					}
-	      					else if(password == ""){
-	      						alert("Bạn nhập sai tên đăng nhập");
-	      					} else {
-	      						alert("Bạn nhập sai mật khẩu");
-	      					}
-	      				})
+	      				.done(function(response) {
+						    if (response === 'success') {
+						        window.location.href = 'http://localhost/hosPro/index.php/quanlybv/menu_khach';
+						    } else {
+						        alert("Bạn nhập sai tên tài khoản hoặc password");
+						    }
+						})
 	      				.fail(function() {
 	      					console.log("error");
 	      				})

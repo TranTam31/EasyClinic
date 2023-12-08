@@ -113,24 +113,26 @@
 		$(document).on('click', '.nutxoa', function(event) {
 			var id_canxoa = $(this).val();
 			var rowToRemove = $(this).closest('tr');
-			$.ajax({
-				url: 'xoaBacsi',
-				type: 'POST',
-				dataType: 'json',
-				data: {id_canxoa: id_canxoa},
-			})
-			.done(function(data) {
-				console.log(data);
-				rowToRemove.remove();
+			var confirmation = confirm("Bạn có muốn xóa bác sĩ này không?");
+    		if (confirmation) {
+				$.ajax({
+					url: 'xoaBacsi',
+					type: 'POST',
+					dataType: 'json',
+					data: {id_canxoa: id_canxoa},
+				})
+				.done(function(data) {
+					console.log(data);
+					rowToRemove.remove();
 
-			})
-			.fail(function() {
-				console.log("error");
-			})
-			.always(function() {
-				console.log("complete");
-			});
-			
+				})
+				.fail(function() {
+					console.log("error");
+				})
+				.always(function() {
+					console.log("complete");
+				});
+			}
 		});
 
 		$(document).on('click', '.thembacsi', function(event) {
@@ -176,52 +178,54 @@
 				alert("Vui lòng nhập đủ thông tin của bác sĩ cần thêm");
 			}
 			else {
-				$.ajax({
-					url: 'themBacsiController',
-					type: 'POST',
-					dataType: 'json',
-					data: {
-						idBacsi: idBacsi,
-						tenBacsi: tenBacsi,
-						sdtBacsi: sdtBacsi,
-						fac_id: fac_id
-					},
-				})
-				.done(function(data) {
-					console.log(data);
-					if(data == "Thêm thành công") {
-						var str = "";
-						str+= "<tr>";
-                        str+= "<td>" + idBacsi + "</td>"
-                        str+= "<td>" + tenBacsi + "</td>"
-                        str+= "<td>" + sdtBacsi + "</td>"
-                        str+= "<td>"
-                        str+= '<div class="row">'
-                        str+= '<div class="col-sm-6"><button class="form-control nutsua btn btn-success">Sửa</button>'
-                        str+= '</div>'
-                        str+= '<div class="col-sm-6"><button value='+idBacsi+' class="form-control nutxoa btn btn-danger">Xóa</button>'
-                        str+='</div>'
-                        str+='</div>'
-                        str+= "</td>"
-                        str+= "</tr>";
+				var confirmation = confirm("Bạn có muốn thêm bác sĩ này không?");
+    			if (confirmation) {
+					$.ajax({
+						url: 'themBacsiController',
+						type: 'POST',
+						dataType: 'json',
+						data: {
+							idBacsi: idBacsi,
+							tenBacsi: tenBacsi,
+							sdtBacsi: sdtBacsi,
+							fac_id: fac_id
+						},
+					})
+					.done(function(data) {
+						console.log(data);
+						if(data == "Thêm thành công") {
+							var str = "";
+							str+= "<tr>";
+	                        str+= "<td>" + idBacsi + "</td>"
+	                        str+= "<td>" + tenBacsi + "</td>"
+	                        str+= "<td>" + sdtBacsi + "</td>"
+	                        str+= "<td>"
+	                        str+= '<div class="row">'
+	                        str+= '<div class="col-sm-6"><button class="form-control nutsua btn btn-success">Sửa</button>'
+	                        str+= '</div>'
+	                        str+= '<div class="col-sm-6"><button value='+idBacsi+' class="form-control nutxoa btn btn-danger">Xóa</button>'
+	                        str+='</div>'
+	                        str+='</div>'
+	                        str+= "</td>"
+	                        str+= "</tr>";
 
-                        $('#load_table_bacsi').append(str);
-                        var myDiv = document.getElementById("myDiv");
-                        myDiv.innerHTML = "";
-                        $('#idBacsi').val('');
-                        $('#tenBacsi').val('');
-                        $('#sdtBacsi').val('');
-					} else {
-						alert("ID bạn đang nhập đã tồn tại! Vui lòng chọn lại ID!");
-					}
-				})
-				.fail(function() {
-					console.log("error");
-				})
-				.always(function() {
-					console.log("complete");
-				});
-				
+	                        $('#load_table_bacsi').append(str);
+	                        var myDiv = document.getElementById("myDiv");
+	                        myDiv.innerHTML = "";
+	                        $('#idBacsi').val('');
+	                        $('#tenBacsi').val('');
+	                        $('#sdtBacsi').val('');
+						} else {
+							alert("ID bạn đang nhập đã tồn tại! Vui lòng chọn lại ID!");
+						}
+					})
+					.fail(function() {
+						console.log("error");
+					})
+					.always(function() {
+						console.log("complete");
+					});
+				}
 			}
 		});
 	</script>

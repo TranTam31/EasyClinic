@@ -68,22 +68,14 @@
 						</div>
 
 						<br>
-						<table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Khoa</th>
-                                    <th>Bác sĩ khám</th>
-                                    <th>Kết quả khám</th>
-                                    <th>Ngày tái khám</th>
-                                    <th>Đơn thuốc</th>
-                                    <th>Thanh toán</th>
-                                </tr>
 
-                            </thead>
-                            <tbody id="load_noidung">
-                                
-                            </tbody>
-                        </table>
+						<div class="row" id="load_ndcanhan">
+							
+						</div>
+
+						<div class="row" id="load_noidung">
+					    	
+					    </div>
 					</div>
 				</div>
 			</div>
@@ -129,6 +121,53 @@
 			var identity = $('.identity').val();
 			if(identity) {
 				$.ajax({
+					url: 'getDataPeople',
+					type: 'POST',
+					dataType: 'json',
+					data: {identity: identity},
+				})
+				.done(function(data) {
+					console.log(data);
+					var str= '';
+					if(data.length != 0) {
+						str += '<hr>'
+						str += '<h4><b>Thông tin cá nhân</b></h4>'
+						str += '<table class="table table-bordered">'
+					    str += '<tbody>'
+				        str += '<tr>'
+				        str += '<td class="col-3"><b>Họ tên</b></td>'
+				        str += '<td>' + data.dulieupeople[0].people_name + '</td>'
+				        str += '</tr>'
+				        str += '<tr>'
+				        str += '<td class="col-3"><b>Giới tính</b></td>'
+				        str += '<td>' + data.dulieupeople[0].sex + '</td>'
+				        str += '</tr>'
+				        str += '<tr>'
+				        str += '<td class="col-3"><b>Ngày sinh</b></td>'
+				        str += '<td>' + data.dulieupeople[0].dob + '</td>'
+				        str += '</tr>'
+				        str += '<tr>'
+				        str += '<td class="col-3"><b>Số điện thoại</b></td>'
+				        str += '<td>' + data.dulieupeople[0].people_phone + '</td>'
+				        str += '</tr>'
+				        str += '<tr>'
+				        str += '<td class="col-3"><b>Địa chỉ</b></td>'
+				        str += '<td>' + data.dulieupeople[0].address + '</td>'
+				        str += '</tr>'
+					    str += '</tbody>'
+					    str += '</table>'
+					}
+					$('#load_ndcanhan').html(str);
+				})
+				.fail(function() {
+					console.log("error");
+				})
+				.always(function() {
+					console.log("complete");
+				});
+				
+
+				$.ajax({
 					url: 'getDataCheckUp',
 					type: 'POST',
 					dataType: 'json',
@@ -138,21 +177,35 @@
 					console.log(data);
 					var str= '';
 					if(data.length != 0) {
-                    $.each(data,function(i, item) {
-                        str+="<h6><i>Ngày khám: " + item.ngaykham + "</i></h6>";
-                        $.each(item.thongtin,function(index, el) {
-	                        str+= "<tr>"
-	                        str+= "<th>"+el.tenkhoa+"</th>"
-	                        str+= "<th>"+el.tenbacsi+"</th>"
-	                        str+= "<th><button data-val='"+ el.id_luotkham +"'class='form-control btn btn-outline-warning nutxemketqua'>Xem</button></th>"
-	                        str+= "<th>"+el.ngaykhamlai+"</th>"
-	                        str+= "<th><button data-val='"+ el.id_luotkham +"'class='form-control btn btn-outline-warning nutxemthuoc'>Xem</button></th>"
-	                        str+= "<th>"+el.thanhtoan+"</th>"
-	                        str+= "</tr>" 
-                        });
-                    });
+						str += '<br>'
+						str += '<h4><b>Thông tin các lượt khám</b></h4>'
+						str += '<table class="table table-bordered">'
+	                    str += '<thead>'
+	                    str += '<tr>'
+	                    str += '<th>Khoa</th>'
+	                    str += '<th>Bác sĩ khám</th>'
+	                    str += '<th>Kết quả khám</th>'
+	                    str += '<th>Ngày tái khám</th>'
+	                    str += '<th>Đơn thuốc</th>'
+	                    str += '<th>Thanh toán</th>'
+	                    str += '</tr>'
+	                    str += '</thead>'
+	                    str += '<tbody>'
+	                    $.each(data,function(i, item) {
+	                        str+="<tr><th><h6><i>Ngày khám: " + item.ngaykham + "</i></h6></tr></th>";
+	                        $.each(item.thongtin,function(index, el) {
+		                        str+= "<tr>"
+		                        str+= "<th>"+el.tenkhoa+"</th>"
+		                        str+= "<th>"+el.tenbacsi+"</th>"
+		                        str+= "<th><button data-val='"+ el.id_luotkham +"'class='form-control btn btn-outline-warning nutxemketqua'>Xem</button></th>"
+		                        str+= "<th>"+el.ngaykhamlai+"</th>"
+		                        str+= "<th><button data-val='"+ el.id_luotkham +"'class='form-control btn btn-outline-warning nutxemthuoc'>Xem</button></th>"
+		                        str+= "<th>"+el.thanhtoan+"</th>"
+		                        str+= "</tr>" 
+	                        });
+	                    });	
                 } else {
-                    str+="<h6 class='text-danger text-center mt-3'>Người này chưa có dữ liệu</h6>";
+                    str+="<h6 class='text-danger text-center mt-3'>Người này chưa có lần khám nào</h6>";
                 }
 	    		$('#load_noidung').html(str);
 				})
@@ -168,7 +221,6 @@
 
 		$(document).on('click', '.nutxemketqua', function(event) {
 			var id_luotKham = $(this).data('val');
-			//alert(id_luotKham);
 			if(id_luotKham) {
 				$.ajax({
 					url: 'getResult',
@@ -232,7 +284,7 @@
 		                htmlContent += '</tbody></table>';
 
 		                const formValues = await Swal.fire({
-		                    title: 'Kết quả khám',
+		                    title: 'Đơn thuốc',
 		                    html: htmlContent
 		                });
 		            })();

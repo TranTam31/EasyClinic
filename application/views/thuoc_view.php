@@ -103,8 +103,15 @@
 		                            label: value.med_name
 		                        };
 		                    });
+							var results = [];
 
-		                    var results = $.ui.autocomplete.filter(aDataMed, request.term);
+		                    // Lọc các từ bắt đầu bằng chuỗi nhập vào
+		                    var term = request.term.toLowerCase();
+		                    aDataMed.forEach(function (item) {
+		                        if (item.label.toLowerCase().startsWith(term)) {
+		                            results.push(item);
+		                        }
+		                    });
 		                    response(results);
 		                }
 		            });
@@ -263,92 +270,48 @@
 			var ncc_thuoc = $('.med_ncc_sua').val();
 			var tp_thuoc = $('.med_tp_sua').val();
 			var cd_thuoc = $('.med_cd_sua').val();
-			$.ajax({
-				url: 'updateThuoc',
-				type: 'POST',
-				dataType: 'json',
-				data: {
-					idThuoc: idThuoc,
-					ten_thuoc: ten_thuoc,
-					ncc_thuoc: ncc_thuoc,
-					tp_thuoc: tp_thuoc,
-					cd_thuoc: cd_thuoc
-				},
-			})
-			.done(function(data) {
-				console.log(data);
-				alert("Bạn đã thay đổi thông tin thuốc thành công!")
-				$('.load_nuttimthuoc').append('<button class="form-control btn btn-success nuttimthuoc">Tìm kiếm</button>');
-				$('.load_nutthemthuoc').html('<button class="form-control btn btn-primary nuttthemthuoc">Thêm thuốc</button>');
-				var str = "";
-				str+= '<tbody>'
-				str+= '<tr>'
-				str+= '<th class="col-2">ID</th>'
-				str+= '<td>'+idThuoc+'</td>'
-				str+= '</tr>'
-				str+= '<tr>'
-				str+= '<th class="col-2">Nhà cung cấp</th>'
-				str+= '<td>'+ncc_thuoc+'</td>'
-				str+= '</tr>'
-				str+= '<tr>'
-				str+= '<th class="col-2">Thành phần</th>'
-				str+= '<td>'+tp_thuoc+'</td>'
-				str+= '</tr>'
-				str+= '<tr>'
-				str+= '<th class="col-2">Chỉ định</th>'
-				str+= '<td>'+cd_thuoc+'</td>'
-				str+= '</tr>'
-				str+= '</tbody>'
-
-				$('.load_thuoc').html(str);
-				$('.nutok').remove();
-				$('.load_nutok').append('<button class="form-control btn btn-warning nutsuathuoc">Sửa thông tin thuốc</button>');
-				$('.load_nutxoa').append('<button class="form-control btn btn-danger nutxoathuoc">Xóa thuốc</button>');
-			})
-			.fail(function() {
-				console.log("error");
-			})
-			.always(function() {
-				console.log("complete");
-			});
-			
-		});
-
-		$(document).on('click', '.nutxoathuoc', function(event) {
-			var idThuoc = $('.med_name').attr('data-id');
-			var ten_thuoc = $('.med_name').val();
-			if(idThuoc) {
+			var confirmation = confirm("Bạn có muốn thay đổi thông tin thuốc không?");
+    		if (confirmation) {
 				$.ajax({
-					url: 'xoaThuoc',
+					url: 'updateThuoc',
 					type: 'POST',
 					dataType: 'json',
-					data: {idThuoc: idThuoc},
+					data: {
+						idThuoc: idThuoc,
+						ten_thuoc: ten_thuoc,
+						ncc_thuoc: ncc_thuoc,
+						tp_thuoc: tp_thuoc,
+						cd_thuoc: cd_thuoc
+					},
 				})
 				.done(function(data) {
 					console.log(data);
-					alert("Bạn đã xóa thành công thuốc có ID: "+idThuoc+" ("+ten_thuoc+")");
-					$('.med_name').val('');
-					var str = '';
+					$('.load_nuttimthuoc').append('<button class="form-control btn btn-success nuttimthuoc">Tìm kiếm</button>');
+					$('.load_nutthemthuoc').html('<button class="form-control btn btn-primary nutthemthuoc">Thêm thuốc</button>');
+					var str = "";
 					str+= '<tbody>'
 					str+= '<tr>'
 					str+= '<th class="col-2">ID</th>'
-					str+= '<td><i>... (Vui lòng nhập tìm một loại thuốc)</i></td>'
+					str+= '<td>'+idThuoc+'</td>'
 					str+= '</tr>'
 					str+= '<tr>'
 					str+= '<th class="col-2">Nhà cung cấp</th>'
-					str+= '<td><i>... (Vui lòng nhập tìm một loại thuốc)</i></td>'
+					str+= '<td>'+ncc_thuoc+'</td>'
 					str+= '</tr>'
 					str+= '<tr>'
 					str+= '<th class="col-2">Thành phần</th>'
-					str+= '<td><i>... (Vui lòng nhập tìm một loại thuốc)</i></td>'
+					str+= '<td>'+tp_thuoc+'</td>'
 					str+= '</tr>'
 					str+= '<tr>'
 					str+= '<th class="col-2">Chỉ định</th>'
-					str+= '<td><i>... (Vui lòng nhập tìm một loại thuốc)</i></td>'
+					str+= '<td>'+cd_thuoc+'</td>'
 					str+= '</tr>'
 					str+= '</tbody>'
 
 					$('.load_thuoc').html(str);
+					$('.nutok').remove();
+					$('.load_nutok').append('<button class="form-control btn btn-warning nutsuathuoc">Sửa thông tin thuốc</button>');
+					$('.load_nutxoa').append('<button class="form-control btn btn-danger nutxoathuoc">Xóa thuốc</button>');
 				})
 				.fail(function() {
 					console.log("error");
@@ -356,6 +319,54 @@
 				.always(function() {
 					console.log("complete");
 				});
+			}
+		});
+
+		$(document).on('click', '.nutxoathuoc', function(event) {
+			var idThuoc = $('.med_name').attr('data-id');
+			var ten_thuoc = $('.med_name').val();
+			if(idThuoc) {
+				var confirmation = confirm("Bạn có muốn xóa thuốc này không?");
+    			if (confirmation) {
+					$.ajax({
+						url: 'xoaThuoc',
+						type: 'POST',
+						dataType: 'json',
+						data: {idThuoc: idThuoc},
+					})
+					.done(function(data) {
+						console.log(data);
+						alert("Bạn đã xóa thành công thuốc có ID: "+idThuoc+" ("+ten_thuoc+")");
+						$('.med_name').val('');
+						var str = '';
+						str+= '<tbody>'
+						str+= '<tr>'
+						str+= '<th class="col-2">ID</th>'
+						str+= '<td><i>... (Vui lòng nhập tìm một loại thuốc)</i></td>'
+						str+= '</tr>'
+						str+= '<tr>'
+						str+= '<th class="col-2">Nhà cung cấp</th>'
+						str+= '<td><i>... (Vui lòng nhập tìm một loại thuốc)</i></td>'
+						str+= '</tr>'
+						str+= '<tr>'
+						str+= '<th class="col-2">Thành phần</th>'
+						str+= '<td><i>... (Vui lòng nhập tìm một loại thuốc)</i></td>'
+						str+= '</tr>'
+						str+= '<tr>'
+						str+= '<th class="col-2">Chỉ định</th>'
+						str+= '<td><i>... (Vui lòng nhập tìm một loại thuốc)</i></td>'
+						str+= '</tr>'
+						str+= '</tbody>'
+
+						$('.load_thuoc').html(str);
+					})
+					.fail(function() {
+						console.log("error");
+					})
+					.always(function() {
+						console.log("complete");
+					});
+				}
 			} else {
 				alert("Bạn chưa nhập thuốc!");
 			}
@@ -411,61 +422,63 @@
 			var tpThuoc = $('.med_tp_them').val();
 			var cdThuoc = $('.med_cd_them').val();
 			if(!tenThuoc || !idThuoc || !nccThuoc || !tpThuoc || !cdThuoc) {
-				alert("Vui lòng nhập đủ thông tin của bác sĩ cần thêm");
+				alert("Vui lòng nhập đủ thông tin của thuốc cần thêm");
 			} else {
-				$.ajax({
-					url: 'themThuocVaoData',
-					type: 'POST',
-					dataType: 'json',
-					data: {
-						tenThuoc: tenThuoc,
-						idThuoc: idThuoc,
-						nccThuoc: nccThuoc,
-						tpThuoc: tpThuoc,
-						cdThuoc: cdThuoc
-					},
-				})
-				.done(function(data) {
-					console.log(data);
-					if(data == "Thêm thành công") {
-						$('.load_nutthemthuoc').html('<button class="form-control btn btn-primary nutthemthuoc">Thêm thuốc</button>');
-						$('.load_nuttimthuoc').html('<button class="form-control btn btn-success nuttimthuoc">Tìm kiếm</button>');
-						$('.load_inputName').html('<input type="text" value="'+tenThuoc+'" class="form-control med_name" data-id="'+idThuoc+'" placeholder="Nhập tên thuốc vào đây">');
-						var str = "";
-						str+= ''
-						str+= '<tbody>'
-						str+= '<tr>'
-						str+= '<th class="col-2">ID</th>'
-						str+= '<td>'+idThuoc+'</td>'
-						str+= '</tr>'
-						str+= '<tr>'
-						str+= '<th class="col-2">Nhà cung cấp</th>'
-						str+= '<td>'+nccThuoc+'</td>'
-						str+= '</tr>'
-						str+= '<tr>'
-						str+= '<th class="col-2">Thành phần</th>'
-						str+= '<td>'+tpThuoc+'</td>'
-						str+= '</tr>'
-						str+= '<tr>'
-						str+= '<th class="col-2">Chỉ định</th>'
-						str+= '<td>'+cdThuoc+'</td>'
-						str+= '</tr>'
-						str+= '</tbody>'
+				var confirmation = confirm("Bạn có muốn thêm thuốc này không?");
+    			if (confirmation) {
+					$.ajax({
+						url: 'themThuocVaoData',
+						type: 'POST',
+						dataType: 'json',
+						data: {
+							tenThuoc: tenThuoc,
+							idThuoc: idThuoc,
+							nccThuoc: nccThuoc,
+							tpThuoc: tpThuoc,
+							cdThuoc: cdThuoc
+						},
+					})
+					.done(function(data) {
+						console.log(data);
+						if(data == "Thêm thành công") {
+							$('.load_nutthemthuoc').html('<button class="form-control btn btn-primary nutthemthuoc">Thêm thuốc</button>');
+							$('.load_nuttimthuoc').html('<button class="form-control btn btn-success nuttimthuoc">Tìm kiếm</button>');
+							$('.load_inputName').html('<input type="text" value="'+tenThuoc+'" class="form-control med_name" data-id="'+idThuoc+'" placeholder="Nhập tên thuốc vào đây">');
+							var str = "";
+							str+= ''
+							str+= '<tbody>'
+							str+= '<tr>'
+							str+= '<th class="col-2">ID</th>'
+							str+= '<td>'+idThuoc+'</td>'
+							str+= '</tr>'
+							str+= '<tr>'
+							str+= '<th class="col-2">Nhà cung cấp</th>'
+							str+= '<td>'+nccThuoc+'</td>'
+							str+= '</tr>'
+							str+= '<tr>'
+							str+= '<th class="col-2">Thành phần</th>'
+							str+= '<td>'+tpThuoc+'</td>'
+							str+= '</tr>'
+							str+= '<tr>'
+							str+= '<th class="col-2">Chỉ định</th>'
+							str+= '<td>'+cdThuoc+'</td>'
+							str+= '</tr>'
+							str+= '</tbody>'
 
-						$('.load_thuoc').html(str);
-						$('.load_nutok').html('<button class="form-control btn btn-warning nutsuathuoc">Sửa thông tin thuốc</button>');
-						$('.load_nutxoa').html('<button class="form-control btn btn-danger nutxoathuoc">Xóa thuốc</button>');
-					} else {
-						alert("ID bạn đang nhập đã tồn tại! Vui lòng chọn lại ID!");
-					}
-				})
-				.fail(function() {
-					console.log("error");
-				})
-				.always(function() {
-					console.log("complete");
-				});
-				
+							$('.load_thuoc').html(str);
+							$('.load_nutok').html('<button class="form-control btn btn-warning nutsuathuoc">Sửa thông tin thuốc</button>');
+							$('.load_nutxoa').html('<button class="form-control btn btn-danger nutxoathuoc">Xóa thuốc</button>');
+						} else {
+							alert("ID bạn đang nhập đã tồn tại! Vui lòng chọn lại ID!");
+						}
+					})
+					.fail(function() {
+						console.log("error");
+					})
+					.always(function() {
+						console.log("complete");
+					});
+				}
 			}
 		});
 	</script>
