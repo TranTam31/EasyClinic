@@ -17,6 +17,11 @@ class quanlybv extends CI_Controller {
 		$this->load->view('menuKhach_view');
 	}
 
+	public function menu_bacsi()
+	{
+		$this->load->view('menuBacsi_view');
+	}
+
 	public function thongtin()
 	{
 		$identity = $this->session->userdata('identity');
@@ -120,6 +125,7 @@ class quanlybv extends CI_Controller {
         $password = $this->input->post('password');
         $this->load->model('hos_model');
 		$matKhau = $this->hos_model->getPassword($identity)->result_array();
+		$matKhauBacsi = $this->hos_model->getPasswordBacsi($identity)->result_array();
 
         if ($userType == 1 && $identity == 'happyHospital' && $password == 'tranductam31') {
             // Đăng nhập thành công
@@ -133,12 +139,28 @@ class quanlybv extends CI_Controller {
             // Hoặc lưu thêm thông tin khác nếu cần
 
             echo 'success';
+        } else if ($userType == 3 && $password == $matKhauBacsi[0]['passdangnhap']) {
+        	$this->session->set_userdata('identity', $identity);
+        	echo 'success';
         } else {
         	echo 'false';
         }
 	}
 
 	public function getPassword()
+	{
+		$identity = $this->input->post('identity');
+		$this->load->model('hos_model');
+		$matKhau = $this->hos_model->getPassword($identity)->result();
+		// echo "<pre>";
+		// var_dump($matKhau);
+		$matKhau = json_encode([
+	    	'matkhau' => $matKhau,
+	    ]);
+	    echo $matKhau;
+	}
+
+	public function getPasswordBacsi()
 	{
 		$identity = $this->input->post('identity');
 		$this->load->model('hos_model');
@@ -428,6 +450,130 @@ class quanlybv extends CI_Controller {
 		$this->hos_model->insertDataLuotKham($dataToSend);
 	}
 
+	// đặt lịch khám
+	public function getDataLuotKham()
+	{
+		$fac_id = $this->input->post('fac_id');
+		$ngaydatkham = $this->input->post('ngaydatkham');
+		$this->load->model('hos_model');
+		$dataLuotKham = $this->hos_model->getDataLuotKham($fac_id, $ngaydatkham)->result();
+		// echo "<pre>";
+		// var_dump($dataLuotKham);
+		$dataLuotKhamFinal = json_encode([
+	    	'dataLuotKham' => $dataLuotKham,
+	    ]);
+		echo $dataLuotKhamFinal;
+	}
+
+	public function postDataDatLich()
+	{
+		$slot_id = $this->input->post('slot_id');
+		$identity = $this->session->userdata('identity');
+		$this->load->model('hos_model');
+		if($this->hos_model->postDataDatLich($slot_id,$identity)) {
+			echo json_encode("Thêm thành công");
+		}
+		else {
+			echo json_encode("Thất bại");
+		}
+	}
+
+	public function get_luotKhamDangCho()
+	{
+		$ngayHomNay = date("Y-m-d");
+		$identity = $this->session->userdata('identity');
+		$this->load->model('hos_model');
+		$luotKhamDangCho = $this->hos_model->get_luotKhamDangCho($identity, $ngayHomNay);
+		$luotKhamDangCho = array("mang_luotKhamDangCho" => $luotKhamDangCho);
+		$this->load->view('luotKhamDangCho_view', $luotKhamDangCho);
+		// $this->load->view('luotKhamDangCho_view');
+		// echo "<pre>";
+		// var_dump("dhjahf");
+	}
+
+	public function getPeopleName()
+	{
+		$identity = $this->input->post('identity');
+		$this->load->model('hos_model');
+		$peopleName = $this->hos_model->getDataPeople($identity)->result();
+		// echo "<pre>";
+		// var_dump($matKhau);
+		$peopleName = json_encode([
+	    	'peopleName' => $peopleName,
+	    ]);
+	    echo $peopleName;
+	}
+
+	public function pushDataLuotKham()
+	{
+		$dataToSend = $this->input->post('dataToSend');
+		$doctor_id = $this->session->userdata('identity');
+		// echo "<pre>";
+		// var_dump($dataToSend);
+		$this->load->model('hos_model');
+		if($this->hos_model->pushDataLuotKham($doctor_id, $dataToSend)) {
+			echo json_encode("OK");
+		}
+		else {
+			echo json_encode("Fail");
+		}
+	}
+
+	public function xoaLuotVuaKham()
+	{
+		$identity = $this->input->post('identity');
+		$ngaykham = $this->input->post('ngaykham');
+		$doctor_id = $this->session->userdata('identity');
+		$this->load->model('hos_model');
+		if($this->hos_model->xoaLuotVuaKham($identity, $ngaykham, $doctor_id)) {
+			echo json_encode("Đã xóa");
+		}
+	}
+
+	// hiển thị lượt khám đang chờ bên bệnh nhân
+	// đoạn này đéo hoạt động được:))))))
+	// public function mangLuotKham_Bn()
+	// {
+	// 	$identity = $this->session->userdata('identity');
+	// 	$this->load->model('hos_model');
+	// 	$mangLuotKham = $this->hos_model->mangLuotKham_Bn($identity);
+	// 	$mangLuotKham = array("mangLuotKham_Bn" => $mangLuotKham);
+	// 	$this->load->view('datlichkham_view', $mangLuotKham);
+	// }
+
+	// ôi má ơi hiểu rồi, ôi hay vãi ò, không hiểu sao mình chợt giật mình nhận ra hehehehehehee.
+	// kiểu mình tưởng là nó chỉ cần load_view là được nhưng không. 
+	public function datlichkham()
+	{
+		// chỗ này là load phần các khoa
+		$this->load->model('hos_model');
+		$fac_main = $this->hos_model->getFac_selectMain();
+		// $fac_main = array("mangkhoa" => $fac_main);
+
+		// phần này là load phần mảng đã đặt
+		$identity = $this->session->userdata('identity');
+		$this->load->model('hos_model');
+		$mangLuotKham = $this->hos_model->mangLuotKham_Bn($identity);
+		// $mangLuotKham = array("mangLuotKham_Bn" => $mangLuotKham);
+
+		$data = array(
+		    "mangkhoa" => $fac_main,
+		    "mangLuotKham_Bn" => $mangLuotKham
+		);
+
+		$data = array("data" => $data);
+
+		// Chuyển mảng duy nhất làm tham số cho hàm load->view()
+		$this->load->view('datlichkham_view', $data);
+		// $this->load->view('datlichkham_view', $fac_main, $mangLuotKham);
+		// echo "<pre>";
+		// var_dump($data);
+
+		// hehe hay vãi, từ đầu mình load 2 lần view, xong nó ra 2 cái, thế là mình gộp 2 cái chung 1 lần load_view hoi. uwu đỉnh vãi ò.....
+		// $this->load->view('datlichkham_view', $mangLuotKham);
+		// echo "<pre>";
+		// var_dump($mangLuotKham);
+	}
 }
 
 /* End of file quanlybv.php */

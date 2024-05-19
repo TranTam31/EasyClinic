@@ -124,7 +124,6 @@
 				.done(function(data) {
 					console.log(data);
 					rowToRemove.remove();
-
 				})
 				.fail(function() {
 					console.log("error");

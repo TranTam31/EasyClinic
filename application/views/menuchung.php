@@ -19,7 +19,6 @@
 			<li><a href="">Người tới khám <i class="fas fa-caret-down"></i></a>
 	            <div class="dropdown-menu">
 	                <ul>
-	                	<li><a href="<?php echo base_url(); ?>index.php/quanlybv/themluotkham">Thêm lượt khám</a></li>
 	                	<li><a href="<?php echo base_url(); ?>index.php/quanlybv/themnguoitoikham">Thêm người tới khám</a></li>
 	                    <li><a href="<?php echo base_url(); ?>index.php/quanlybv/tracuu">Tra cứu</a></li>
 	                </ul>

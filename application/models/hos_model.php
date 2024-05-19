@@ -77,6 +77,13 @@ class hos_model extends CI_Model {
 		return $this->db->get('people');
 	}
 
+	public function getPasswordBacsi($identity)
+	{
+		$this->db->select('passdangnhap');
+		$this->db->where('doctor_id', $identity);
+		return $this->db->get('doctor');
+	}
+
 	public function insertDataLuotKham($dataToSend)
 	{
 		$get_iden = $dataToSend['identity'];
@@ -272,6 +279,126 @@ class hos_model extends CI_Model {
         $this->db->where('id_luotkham', $id_luotKham);
         $query = $this->db->get();
         return $query;
+	}
+
+
+	//đặt lịch khám
+	public function getDataLuotKham($fac_id, $ngaydatkham)
+	{
+		$this->db->select('available_slots.slot_id, doctor.doctor_id, doctor.doctor_name, available_slots.work_date, available_slots.available_slot');
+		$this->db->from('doctor');
+		$this->db->join('available_slots', 'doctor.doctor_id = available_slots.doctor_id', 'left');
+		$this->db->where('doctor.fac_id', $fac_id);
+		$this->db->where('available_slots.work_date', $ngaydatkham);
+		$this->db->where('available_slots.available_slot >', 0);
+		$query = $this->db->get();
+		return $query;
+	}
+
+
+	public function postDataDatLich($slot_id,$identity)
+	{
+		$this->db->select('work_date, available_slot');
+		$this->db->from('available_slots');
+		$this->db->where('slot_id', $slot_id);
+		$query = $this->db->get()->result_array();
+		foreach ($query as $row) {
+	        $work_date = $row['work_date'];
+	        $available_slot = $row['available_slot'];
+	        $stt = (11 - $row['available_slot']);
+	    }
+		$dulieu = array(
+			'slot_id' => $slot_id,
+			'stt' => $stt,
+			'identity' => $identity,
+			);
+		if($this->db->get_where('dsdatlich', array('identity' => $identity, 'slot_id' => $slot_id))->num_rows() > 0) {
+			return 0;
+		} else {
+			$this->db->insert('dsdatlich', $dulieu);
+			$data = array(
+				'available_slot' => $available_slot - 1, 
+				);
+			$this->db->where('slot_id', $slot_id);
+			$this->db->update('available_slots', $data);
+			return 1;
+		}
+	}
+	
+	public function get_luotKhamDangCho($identity, $ngayHomNay)
+	{
+		$this->db->select('dsdatlich.stt, dsdatlich.identity, people.people_name');
+		$this->db->from('available_slots');
+		$this->db->join('dsdatlich', 'available_slots.slot_id = dsdatlich.slot_id');
+		$this->db->join('people', 'dsdatlich.identity = people.identity');
+		$this->db->where('available_slots.doctor_id', $identity);
+		$this->db->where('available_slots.work_date', $ngayHomNay);
+		return $this->db->get()->result_array();
+	}
+
+	public function pushDataLuotKham($doctor_id, $dataToSend)
+	{
+		$get_iden = $dataToSend['identity'];
+		$get_date = $dataToSend['ngaykham'];
+	    $get_doctor = $doctor_id;
+	    $get_result = $dataToSend['results'];
+	    $get_revisitDate = $dataToSend['revisit_date'];
+	    $get_payment = $dataToSend['payment'];
+	    $dulieuLuotKham = array(
+			'checkDate' => $get_date,
+			'identity' => $get_iden, 
+			'doctor_id' => $get_doctor, 
+			'result' => $get_result, 
+			'fee' => $get_payment, 
+			'recheckDate' => $get_revisitDate, 
+		);
+		
+	    $this->db->insert('checkup', $dulieuLuotKham);
+	    $get_idLuotKham = $this->db->insert_id();
+	    foreach ($dataToSend['medicines'] as $thuoc) {
+	        $get_medId = $thuoc['med_id'];
+	        $get_medDose = $thuoc['med_dose'];
+	        $dulieuDonThuoc = array(
+				'id_luotkham' => $get_idLuotKham,
+				'med_id' => $get_medId,
+				'dose' => $get_medDose,
+			);
+		    $this->db->insert('prescription', $dulieuDonThuoc);
+	    }
+		return 1;
+	}
+
+	// public function xoaLuotVuaKham($identity, $ngaykham, $doctor_id)
+	// {
+	// 	$this->db->from('dsdatlich');
+	// 	$this->db->join('available_slots', 'available_slots.slot_id = dsdatlich.slot_id');
+	// 	$this->db->where('dsdatlich.identity', $identity);
+	// 	$this->db->where('available_slots.doctor_id', $doctor_id);
+	// 	$this->db->where('available_slots.work_date', $ngaykham);
+	// 	return $this->db->delete('dsdatlich');
+	// }
+
+	// ui ui đcm ảo vãi ò... Cái trên mình không làm được mặc dù chat bảo thế
+	// xong cái mình dùng cái dưới này được cmnl nài, đcm ảo lòi....
+	public function xoaLuotVuaKham($identity, $ngaykham, $doctor_id)
+	{
+		$sql = "DELETE dsdatlich 
+		        FROM dsdatlich 
+		        JOIN available_slots ON available_slots.slot_id = dsdatlich.slot_id
+		        WHERE dsdatlich.identity = ? 
+		        AND available_slots.doctor_id = ? 
+		        AND available_slots.work_date = ?";
+
+		$this->db->query($sql, array($identity, $doctor_id, $ngaykham));
+	}
+
+	public function mangLuotKham_Bn($identity)
+	{
+		$this->db->select('dsdatlich.stt, available_slots.doctor_id, available_slots.work_date');
+	    $this->db->from('dsdatlich');
+	    $this->db->join('available_slots', 'dsdatlich.slot_id = available_slots.slot_id');
+	    $this->db->where('dsdatlich.identity', $identity);
+	    return $this->db->get()->result_array();
 	}
 }
 

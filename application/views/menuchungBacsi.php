@@ -7,9 +7,8 @@
 		<!-- <a class="logo" href="<?php echo base_url(); ?>index.php/quanlybv/menu_khach">HospitalProject</a> -->
         <h1 class="logo">Happy Hospital</h1>
         <ul>
-			<li><a href="<?php echo base_url(); ?>index.php/quanlybv/thongtin">Tra cứu</a></li>
-			<li><a href="<?php echo base_url(); ?>index.php/quanlybv/datlichkham">Đặt lịch khám</a></li>
-			<li><a href="<?php echo base_url(); ?>index.php/quanlybv/doimk">Đổi mật khẩu</a></li>
+			<li><a href="<?php echo base_url(); ?>index.php/quanlybv/get_luotKhamDangCho">Lượt khám đang chờ</a></li>
+			<!-- <li><a href="<?php echo base_url(); ?>index.php/quanlybv/doimk">Đổi mật khẩu</a></li> -->
         	<li><a href="#" onclick="confirmLogout()">Đăng xuất</a></li>
         </ul>
     </div>

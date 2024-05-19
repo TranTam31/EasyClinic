@@ -36,6 +36,7 @@
 				    		<option value="0">Chọn một option</option>
 				    		<option value="1">Nhân viên</option>
 				    		<option value="2">Người tới khám</option>
+				    		<option value="3">Bác sĩ</option>
 				    	</select>
 		    		</div>
 		    	</div>
@@ -116,6 +117,33 @@
 	      				.done(function(response) {
 						    if (response === 'success') {
 						        window.location.href = 'http://localhost/hosPro/index.php/quanlybv/menu_khach';
+						    } else {
+						        alert("Bạn nhập sai tên tài khoản hoặc password");
+						    }
+						})
+	      				.fail(function() {
+	      					console.log("error");
+	      				})
+	      				.always(function() {
+	      					console.log("complete");
+	      				});
+      				} else {
+      					alert("Hãy nhập tên tài khoản");
+      				}
+      			} else if(userType == 3){
+      				if(identity) {
+	      				$.ajax({
+	      					url: 'taoSession',
+	      					type: 'POST',
+	      					data: {
+	      						userType: userType,
+	      						identity: identity,
+	      						password: password
+	      					},
+	      				})
+	      				.done(function(response) {
+						    if (response === 'success') {
+						        window.location.href = 'http://localhost/hosPro/index.php/quanlybv/menu_bacsi';
 						    } else {
 						        alert("Bạn nhập sai tên tài khoản hoặc password");
 						    }
